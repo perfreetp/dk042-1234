@@ -15,6 +15,15 @@ const categoryKeyToLabel: Record<string, string> = {
   other: '其他',
 };
 
+const roleKeyToLabel: Record<string, string> = {
+  operator: '运营负责人',
+  sales: '销售推广',
+  design: '设计创意',
+  tech: '技术开发',
+  finance: '财务行政',
+  investor: '资金投入',
+};
+
 const FilterPage: React.FC = () => {
   const { projects, setGlobalFilter } = useApp();
 
@@ -73,11 +82,13 @@ const FilterPage: React.FC = () => {
     }
 
     if (selectedRoles.length > 0) {
+      const roleLabels = selectedRoles.map(k => roleKeyToLabel[k]).filter(Boolean);
       filtered = filtered.filter(p =>
         p.requiredRoles.some(role =>
-          selectedRoles.some(r =>
-            role.name.includes(r) ||
-            role.skills.some(s => s.includes(r))
+          roleLabels.some(label =>
+            role.name.includes(label) ||
+            label.includes(role.name) ||
+            role.skills.some(s => s.includes(label) || label.includes(s))
           )
         )
       );

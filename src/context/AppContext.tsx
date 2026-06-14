@@ -1,8 +1,43 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo, useEffect } from 'react';
+import Taro from '@tarojs/taro';
 import { User } from '@/types/user';
 import { Project, InvestmentLevel, TimeIntensity, ProjectCategory } from '@/types/project';
 import { currentUser, mockUsers } from '@/data/users';
 import { mockProjects } from '@/data/projects';
+
+const STORAGE_KEYS = {
+  USER: 'partner_app_user',
+  PROJECTS: 'partner_app_projects',
+  GLOBAL_FILTER: 'partner_app_global_filter',
+  MEET_INVITATIONS: 'partner_app_meet_invitations',
+};
+
+const safeParse = <T,>(data: string | null, fallback: T): T => {
+  if (!data) return fallback;
+  try {
+    return JSON.parse(data) as T;
+  } catch {
+    return fallback;
+  }
+};
+
+const safeSetStorage = (key: string, value: any) => {
+  try {
+    Taro.setStorageSync(key, JSON.stringify(value));
+  } catch (e) {
+    console.warn('[Storage] 写入失败:', key, e);
+  }
+};
+
+const safeGetStorage = <T,>(key: string, fallback: T): T => {
+  try {
+    const data = Taro.getStorageSync(key);
+    return safeParse<T>(data, fallback);
+  } catch (e) {
+    console.warn('[Storage] 读取失败:', key, e);
+    return fallback;
+  }
+};
 
 export interface GlobalFilterOptions {
   categories: string[];
@@ -61,12 +96,51 @@ const defaultFilter: GlobalFilterOptions = {
 };
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User>(currentUser);
+  const [initializing, setInitializing] = useState(true);
+  const [savedUser] = useState<User>(() => safeGetStorage<User>(STORAGE_KEYS.USER, currentUser));
+  const [savedProjects] = useState<Project[]>(() => safeGetStorage<Project[]>(STORAGE_KEYS.PROJECTS, mockProjects));
+  const [savedFilter] = useState<GlobalFilterOptions | null>(() => safeGetStorage<GlobalFilterOptions | null>(STORAGE_KEYS.GLOBAL_FILTER, null));
+  const [savedInvitations] = useState<MeetInvitation[]>(() => safeGetStorage<MeetInvitation[]>(STORAGE_KEYS.MEET_INVITATIONS, []));
+
+  const [user, setUser] = useState<User>(savedUser);
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(5);
-  const [allUsers] = useState<User[]>([currentUser, ...mockUsers]);
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
-  const [globalFilter, setGlobalFilter] = useState<GlobalFilterOptions | null>(null);
-  const [meetInvitations, setMeetInvitations] = useState<MeetInvitation[]>([]);
+  const [projects, setProjects] = useState<Project[]>(savedProjects);
+  const [globalFilter, setGlobalFilter] = useState<GlobalFilterOptions | null>(savedFilter);
+  const [meetInvitations, setMeetInvitations] = useState<MeetInvitation[]>(savedInvitations);
+
+  useEffect(() => {
+    if (!initializing) {
+      safeSetStorage(STORAGE_KEYS.USER, user);
+    }
+  }, [user, initializing]);
+
+  useEffect(() => {
+    if (!initializing) {
+      safeSetStorage(STORAGE_KEYS.PROJECTS, projects);
+    }
+  }, [projects, initializing]);
+
+  useEffect(() => {
+    if (!initializing) {
+      safeSetStorage(STORAGE_KEYS.GLOBAL_FILTER, globalFilter);
+    }
+  }, [globalFilter, initializing]);
+
+  useEffect(() => {
+    if (!initializing) {
+      safeSetStorage(STORAGE_KEYS.MEET_INVITATIONS, meetInvitations);
+    }
+  }, [meetInvitations, initializing]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setInitializing(false), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const allUsers = useMemo<User[]>(() => {
+    const others = mockUsers.filter(u => u.id !== user.id);
+    return [user, ...others];
+  }, [user]);
 
   const getUserById = useCallback((id: string): User | undefined => {
     return allUsers.find(u => u.id === id);

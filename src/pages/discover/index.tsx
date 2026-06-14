@@ -17,6 +17,15 @@ const categoryFilterKeyToLabel: Record<string, string> = {
   other: '其他',
 };
 
+const roleKeyToLabel: Record<string, string> = {
+  operator: '运营负责人',
+  sales: '销售推广',
+  design: '设计创意',
+  tech: '技术开发',
+  finance: '财务行政',
+  investor: '资金投入',
+};
+
 const DiscoverPage: React.FC = () => {
   const { projects, globalFilter, setGlobalFilter } = useApp();
 
@@ -47,11 +56,13 @@ const DiscoverPage: React.FC = () => {
       }
 
       if (globalFilter.roles && globalFilter.roles.length > 0) {
+        const roleLabels = globalFilter.roles.map(k => roleKeyToLabel[k]).filter(Boolean);
         filtered = filtered.filter(p =>
           p.requiredRoles.some(role =>
-            globalFilter.roles.some(r =>
-              role.name.includes(r) ||
-              role.skills.some(s => s.includes(r))
+            roleLabels.some(label =>
+              role.name.includes(label) ||
+              label.includes(role.name) ||
+              role.skills.some(s => s.includes(label) || label.includes(s))
             )
           )
         );
@@ -206,7 +217,8 @@ const DiscoverPage: React.FC = () => {
       parts.push(`¥${globalFilter.investmentMin}-${globalFilter.investmentMax}`);
     }
     if (globalFilter.roles && globalFilter.roles.length > 0) {
-      parts.push(`角色(${globalFilter.roles.length})`);
+      const names = globalFilter.roles.map(k => roleKeyToLabel[k] || k);
+      parts.push(`角色(${names.length})`);
     }
     return parts.join(' · ');
   }, [globalFilter]);

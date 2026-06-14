@@ -26,6 +26,10 @@ const ProfilePage: React.FC = () => {
     const userId = router.params.id;
     console.log('[ProfilePage] 用户ID:', userId);
     
+    setProfileUser(null);
+    setLoading(true);
+    setMeetModalVisible(false);
+
     if (!userId) {
       setLoading(false);
       return;
@@ -43,7 +47,7 @@ const ProfilePage: React.FC = () => {
         setProfileUser(fallbackUser);
       }
       setLoading(false);
-    }, 100);
+    }, 80);
   }, [router.params.id, getUserById]);
 
   const handleHello = () => {
