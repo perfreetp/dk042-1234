@@ -46,22 +46,35 @@ const EditProfilePage: React.FC = () => {
     '时间灵活': 'any',
   };
 
-  const [formData, setFormData] = useState({
-    name: user.name,
-    bio: user.bio,
-    location: user.location,
-    skills: user.skills.map(s => s.name),
-    weekdays: user.availableTime.weekdays,
-    weekends: user.availableTime.weekends,
-    resources: user.resources.map(r => r.name),
-    categories: user.cooperationPreferences.projectCategories,
-    investment: findInvestmentLabel(user.cooperationPreferences.investmentRange),
-    timeCommitment: (() => {
-      const m: Record<string, string> = { 'weekend': '仅周末', 'parttime': '兼职', 'any': '时间灵活' };
-      return m[user.cooperationPreferences.timeCommitment] || '兼职';
-    })(),
-    preferredRole: user.cooperationPreferences.preferRoles[0] || '运营负责人',
-    minCreditScore: user.cooperationPreferences.minCreditScore.toString(),
+  const [formData, setFormData] = useState(() => {
+    const safeSkills = Array.isArray(user.skills) ? user.skills : [];
+    const safeResources = Array.isArray(user.resources) ? user.resources : [];
+    const safeAvailTime = user.availableTime || { weekdays: [], weekends: [], totalHoursPerWeek: 0 };
+    const safePrefs = user.cooperationPreferences || {
+      projectCategories: [],
+      investmentRange: [0, 10000],
+      timeCommitment: 'parttime',
+      preferRoles: [],
+      minCreditScore: 80,
+    };
+
+    return {
+      name: user.name || '',
+      bio: user.bio || '',
+      location: user.location || '',
+      skills: safeSkills.map(s => s.name),
+      weekdays: Array.isArray(safeAvailTime.weekdays) ? safeAvailTime.weekdays : [],
+      weekends: Array.isArray(safeAvailTime.weekends) ? safeAvailTime.weekends : [],
+      resources: safeResources.map(r => r.name),
+      categories: Array.isArray(safePrefs.projectCategories) ? safePrefs.projectCategories : [],
+      investment: findInvestmentLabel(safePrefs.investmentRange || [0, 10000]),
+      timeCommitment: (() => {
+        const m: Record<string, string> = { 'weekend': '仅周末', 'parttime': '兼职', 'any': '时间灵活' };
+        return m[safePrefs.timeCommitment] || '兼职';
+      })(),
+      preferredRole: (safePrefs.preferRoles && safePrefs.preferRoles[0]) || '运营负责人',
+      minCreditScore: String(safePrefs.minCreditScore ?? 80),
+    };
   });
 
   const [newSkill, setNewSkill] = useState('');
@@ -185,6 +198,12 @@ const EditProfilePage: React.FC = () => {
 
               const updatedUser: User = {
                 ...user,
+                id: user.id,
+                avatar: user.avatar,
+                creditScore: user.creditScore,
+                completedProjects: user.completedProjects,
+                successRate: user.successRate,
+                reviews: user.reviews || [],
                 name: formData.name.trim(),
                 bio: formData.bio.trim(),
                 location: formData.location.trim(),
@@ -196,11 +215,10 @@ const EditProfilePage: React.FC = () => {
                   totalHoursPerWeek: totalHours,
                 },
                 cooperationPreferences: {
-                  ...user.cooperationPreferences,
-                  projectCategories: formData.categories.length > 0 ? formData.categories : user.cooperationPreferences.projectCategories,
+                  projectCategories: formData.categories.length > 0 ? formData.categories : ['摊位经营', '探店账号'],
                   investmentRange,
                   timeCommitment,
-                  preferRoles: formData.preferredRole ? [formData.preferredRole] : user.cooperationPreferences.preferRoles,
+                  preferRoles: formData.preferredRole ? [formData.preferredRole] : ['运营负责人'],
                   minCreditScore,
                 },
               };
@@ -434,9 +452,16 @@ const EditProfilePage: React.FC = () => {
                 backgroundColor="#f0f0f0"
                 blockColor="#ff7d00"
                 blockSize={24}
-                onChange={(e) => handleInputChange('minCreditScore', String(e.detail.value))}
+                onChange={(e) => {
+                  const val = typeof e.detail === 'object' ? e.detail.value : e.detail;
+                  handleInputChange('minCreditScore', String(val));
+                }}
+                onChanging={(e) => {
+                  const val = typeof e.detail === 'object' ? e.detail.value : e.detail;
+                  handleInputChange('minCreditScore', String(val));
+                }}
               />
-              <Text className={styles.scoreValue}>{formData.minCreditScore}分</Text>
+              <Text className={styles.scoreValue}>{parseInt(formData.minCreditScore) || 80}分</Text>
             </View>
           </View>
         </View>

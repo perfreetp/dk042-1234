@@ -24,6 +24,15 @@ const roleKeyToLabel: Record<string, string> = {
   investor: '资金投入',
 };
 
+const roleLabelToKeywords: Record<string, string[]> = {
+  '运营负责人': ['运营', '负责', '管理', '主管', '总监', '经理'],
+  '销售推广': ['销售', '推广', '业务', '市场', '商务', '拓展'],
+  '设计创意': ['设计', '创意', '美术', '视觉', 'UI', '美工'],
+  '技术开发': ['技术', '开发', '程序', '代码', 'IT', '工程师', '程序员', '前端', '后端'],
+  '财务行政': ['财务', '会计', '行政', '人事', '客服', '出纳'],
+  '资金投入': ['资金', '投资', '出资', '金主', '合伙人', '天使'],
+};
+
 const FilterPage: React.FC = () => {
   const { projects, setGlobalFilter } = useApp();
 
@@ -83,14 +92,12 @@ const FilterPage: React.FC = () => {
 
     if (selectedRoles.length > 0) {
       const roleLabels = selectedRoles.map(k => roleKeyToLabel[k]).filter(Boolean);
+      const allKeywords = roleLabels.flatMap(label => roleLabelToKeywords[label] || [label]);
       filtered = filtered.filter(p =>
-        p.requiredRoles.some(role =>
-          roleLabels.some(label =>
-            role.name.includes(label) ||
-            label.includes(role.name) ||
-            role.skills.some(s => s.includes(label) || label.includes(s))
-          )
-        )
+        p.requiredRoles.some(role => {
+          const roleText = role.name + role.skills.join('');
+          return allKeywords.some(kw => roleText.includes(kw));
+        })
       );
     }
 

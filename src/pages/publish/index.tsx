@@ -191,6 +191,7 @@ const PublishPage: React.FC = () => {
           startupCost: Number(formData.startupCost) || 0,
           trialPeriod: formData.trialPeriod,
           exitAgreement: formData.exitAgreement.trim(),
+          goals: formData.goals.trim(),
           publisher: {
             id: user.id,
             name: user.name,

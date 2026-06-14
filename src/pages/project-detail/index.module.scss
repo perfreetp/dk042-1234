@@ -102,11 +102,17 @@
 
 .roleItem {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: $spacing-sm;
   padding: $spacing-md;
   background: $color-bg-page;
   border-radius: $radius-sm;
+}
+
+.roleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .roleName {
@@ -118,6 +124,26 @@
 .roleCount {
   font-size: $font-size-sm;
   color: $color-primary;
+}
+
+.roleDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+}
+
+.roleSkills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+.skillTag {
+  padding: 4rpx 16rpx;
+  background: $color-primary-light;
+  color: $color-primary;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
 }
 
 .publisher {

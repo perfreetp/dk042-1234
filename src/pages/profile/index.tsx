@@ -131,7 +131,12 @@ const ProfilePage: React.FC = () => {
   console.log('[ProfilePage] 渲染用户:', profileUser.name, '技能数:', skills.length, '资源数:', resources.length);
 
   return (
-    <View className={styles.page}>
+    <View className={styles.page} key={router.params.id}>
+      {loading || !profileUser ? (
+        <View style={{ padding: 120, textAlign: 'center' }}>
+          <Text style={{ fontSize: 32, color: '#999' }}>加载中...</Text>
+        </View>
+      ) : (
       <ScrollView scrollY enhanced showScrollbar={false} style={{ minHeight: '100vh' }}>
         <View className={styles.header}>
           <View className={styles.profileCard}>
@@ -358,6 +363,7 @@ const ProfilePage: React.FC = () => {
         targetUser={profileUser}
         onClose={() => setMeetModalVisible(false)}
       />
+      )}
     </View>
   );
 };

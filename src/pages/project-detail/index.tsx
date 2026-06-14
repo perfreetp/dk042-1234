@@ -95,7 +95,7 @@ const ProjectDetailPage: React.FC = () => {
   }
 
   return (
-    <View className={styles.page}>
+    <View className={styles.page} key={router.params.id}>
       <Image 
         className={styles.coverImage} 
         src={project.coverImage} 
@@ -114,6 +114,13 @@ const ProjectDetailPage: React.FC = () => {
           <Text className={styles.sectionTitle}>📋 项目介绍</Text>
           <Text className={styles.description}>{project.description}</Text>
         </View>
+
+        {project.goals && (
+          <View className={styles.section}>
+            <Text className={styles.sectionTitle}>🎯 合作目标</Text>
+            <Text className={styles.description}>{project.goals}</Text>
+          </View>
+        )}
 
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>💰 基本信息</Text>
@@ -142,8 +149,20 @@ const ProjectDetailPage: React.FC = () => {
           <View className={styles.roleList}>
             {project.requiredRoles.map((role, index) => (
               <View key={index} className={styles.roleItem}>
-                <Text className={styles.roleName}>{role.name}</Text>
-                <Text className={styles.roleCount}>{role.count}人 · {role.description}</Text>
+                <View className={styles.roleHeader}>
+                  <Text className={styles.roleName}>{role.name}</Text>
+                  <Text className={styles.roleCount}>{role.count}人</Text>
+                </View>
+                {role.description && (
+                  <Text className={styles.roleDesc}>{role.description}</Text>
+                )}
+                {role.skills && role.skills.length > 0 && (
+                  <View className={styles.roleSkills}>
+                    {role.skills.map((skill, i) => (
+                      <Text key={i} className={styles.skillTag}>{skill}</Text>
+                    ))}
+                  </View>
+                )}
               </View>
             ))}
           </View>

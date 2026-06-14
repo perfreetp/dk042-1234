@@ -13,6 +13,7 @@ export interface Project {
   startupCost: number;
   trialPeriod: string;
   exitAgreement: string;
+  goals?: string;
   publisher: Publisher;
   status: 'recruiting' | 'in_progress' | 'completed';
   createdAt: string;
