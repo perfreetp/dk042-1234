@@ -47,6 +47,7 @@ export interface Publisher {
   avatar: string;
   creditScore: number;
   completedProjects: number;
+  bio?: string;
 }
 
 export interface FilterOptions {

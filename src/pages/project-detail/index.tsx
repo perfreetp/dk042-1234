@@ -201,7 +201,13 @@ const ProjectDetailPage: React.FC = () => {
                   </View>
                 )}
               </View>
-              <Text className={styles.publisherBio}>{project.publisher.bio}</Text>
+              <View style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 4 }}>
+                <Text style={{ fontSize: 22, color: '#ff7d00' }}>⭐ 信用{project.publisher.creditScore}分</Text>
+                <Text style={{ fontSize: 22, color: '#86909c' }}>已完成{project.publisher.completedProjects}个项目</Text>
+              </View>
+              <Text className={styles.publisherBio}>
+                {project.publisher.bio || '这位发布者暂未填写个人介绍'}
+              </Text>
             </View>
           </View>
         </View>

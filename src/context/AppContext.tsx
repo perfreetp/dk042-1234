@@ -151,6 +151,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setProjects(prev => [project, ...prev]);
   }, []);
 
+  const enrichPublisherBio = useCallback((projects: Project[], users: User[]): Project[] => {
+    return projects.map(p => {
+      if (p.publisher.bio) return p;
+      const found = users.find(u => u.id === p.publisher.id || u.name === p.publisher.name);
+      if (found && found.bio) {
+        return { ...p, publisher: { ...p.publisher, bio: found.bio } };
+      }
+      return p;
+    });
+  }, []);
+
+  const projectsWithBio = useMemo(
+    () => enrichPublisherBio(projects, allUsers),
+    [projects, allUsers, enrichPublisherBio]
+  );
+
   const getMyPublishedProjects = useCallback((): Project[] => {
     return projects.filter(p => p.publisher.id === user.id || p.publisher.name === user.name);
   }, [projects, user]);
@@ -186,7 +202,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setUnreadMessageCount,
     allUsers,
     getUserById,
-    projects,
+    projects: projectsWithBio,
     addProject,
     getMyPublishedProjects,
     getMyJoinedProjects,
@@ -200,7 +216,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     unreadMessageCount,
     allUsers,
     getUserById,
-    projects,
+    projectsWithBio,
     addProject,
     getMyPublishedProjects,
     getMyJoinedProjects,

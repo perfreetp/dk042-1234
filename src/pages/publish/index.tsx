@@ -198,6 +198,7 @@ const PublishPage: React.FC = () => {
             avatar: user.avatar,
             creditScore: user.creditScore,
             completedProjects: user.completedProjects,
+            bio: user.bio,
           },
           status: 'recruiting',
           createdAt: new Date().toISOString().slice(0, 10),
