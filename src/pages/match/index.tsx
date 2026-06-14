@@ -3,9 +3,10 @@ import { View, Text, ScrollView, Button } from '@tarojs/components';
 import Taro, { usePullDownRefresh } from '@tarojs/taro';
 import classnames from 'classnames';
 import { User } from '@/types/user';
-import { mockUsers, currentUser } from '@/data/users';
+import { mockUsers } from '@/data/users';
 import { useApp } from '@/context/AppContext';
 import UserCard from '@/components/UserCard';
+import MeetModal from '@/components/MeetModal';
 import styles from './index.module.scss';
 
 const filterOptions = [
@@ -22,29 +23,32 @@ const MatchPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
 
+  const [meetModalVisible, setMeetModalVisible] = useState(false);
+  const [meetTargetUser, setMeetTargetUser] = useState<User | null>(null);
+
   const calculateMatchScore = useCallback((targetUser: User): number => {
     let score = 60;
-    
+
     const userSkills = user.skills.map(s => s.name.toLowerCase());
     const targetSkills = targetUser.skills.map(s => s.name.toLowerCase());
-    
+
     const complementary = targetSkills.filter(s => !userSkills.includes(s));
     score += complementary.length * 5;
-    
+
     const matchingCategories = targetUser.cooperationPreferences.projectCategories.filter(
       c => user.cooperationPreferences.projectCategories.includes(c)
     );
     score += matchingCategories.length * 3;
-    
+
     if (targetUser.creditScore >= user.cooperationPreferences.minCreditScore) {
       score += 5;
     }
-    
-    const timeMatch = 
+
+    const timeMatch =
       user.cooperationPreferences.timeCommitment === 'any' ||
       targetUser.cooperationPreferences.timeCommitment === user.cooperationPreferences.timeCommitment;
     if (timeMatch) score += 5;
-    
+
     return Math.min(99, score);
   }, [user]);
 
@@ -59,7 +63,7 @@ const MatchPage: React.FC = () => {
   const loadMatches = useCallback(() => {
     setLoading(true);
     console.log('[MatchPage] 加载匹配用户');
-    
+
     setTimeout(() => {
       const matchedUsers = mockUsers
         .filter(u => u.id !== user.id)
@@ -69,10 +73,9 @@ const MatchPage: React.FC = () => {
           complementarySkills: getComplementarySkills(u)
         }))
         .sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
-      
+
       setUsers(matchedUsers);
       setLoading(false);
-      console.log('[MatchPage] 加载完成，匹配用户数:', matchedUsers.length);
     }, 800);
   }, [user, calculateMatchScore, getComplementarySkills]);
 
@@ -98,7 +101,7 @@ const MatchPage: React.FC = () => {
   const handleFilterChange = (key: string) => {
     setActiveFilter(key);
     console.log('[MatchPage] 筛选:', key);
-    
+
     let filtered = [...mockUsers]
       .filter(u => u.id !== user.id)
       .map(u => ({
@@ -106,7 +109,7 @@ const MatchPage: React.FC = () => {
         matchScore: calculateMatchScore(u),
         complementarySkills: getComplementarySkills(u)
       }));
-    
+
     switch (key) {
       case 'high':
         filtered = filtered.filter(u => (u.matchScore || 0) >= 85);
@@ -120,7 +123,7 @@ const MatchPage: React.FC = () => {
         filtered = filtered.filter(u => u.creditScore >= 90);
         break;
     }
-    
+
     filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
     setUsers(filtered);
   };
@@ -151,18 +154,13 @@ const MatchPage: React.FC = () => {
 
   const handleMeet = (targetUser: User) => {
     console.log('[MatchPage] 约线下见面:', targetUser.name);
-    Taro.showModal({
-      title: '约线下见面',
-      content: `确定要向${targetUser.name}发送线下见面邀请吗？建议在公共场所见面，注意安全。`,
-      success: (res) => {
-        if (res.confirm) {
-          Taro.showToast({
-            title: '邀请已发送',
-            icon: 'success'
-          });
-        }
-      }
-    });
+    setMeetTargetUser(targetUser);
+    setMeetModalVisible(true);
+  };
+
+  const handleCloseMeetModal = () => {
+    setMeetModalVisible(false);
+    setMeetTargetUser(null);
   };
 
   const handleImproveProfile = () => {
@@ -203,7 +201,7 @@ const MatchPage: React.FC = () => {
           </View>
         </View>
       </View>
-      
+
       <ScrollView
         className={styles.filterBar}
         scrollX
@@ -222,7 +220,7 @@ const MatchPage: React.FC = () => {
           </Button>
         ))}
       </ScrollView>
-      
+
       <ScrollView
         className={styles.list}
         scrollY
@@ -254,6 +252,12 @@ const MatchPage: React.FC = () => {
           </View>
         )}
       </ScrollView>
+
+      <MeetModal
+        visible={meetModalVisible}
+        targetUser={meetTargetUser}
+        onClose={handleCloseMeetModal}
+      />
     </View>
   );
 };

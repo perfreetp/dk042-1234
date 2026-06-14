@@ -33,6 +33,7 @@ export interface Resource {
   type: 'equipment' | 'space' | 'capital' | 'network' | 'other';
   name: string;
   description: string;
+  icon?: string;
 }
 
 export interface Review {

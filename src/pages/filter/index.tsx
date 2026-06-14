@@ -1,10 +1,23 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, Slider, Button, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
-import { mockProjects } from '@/data/projects';
+import { useApp, GlobalFilterOptions } from '@/context/AppContext';
+import { investmentLevels } from '@/data/projects';
+import { InvestmentLevel, TimeIntensity } from '@/types/project';
 import styles from './index.module.scss';
 
+const categoryKeyToLabel: Record<string, string> = {
+  stall: '摊位经营',
+  review: '探店账号',
+  handmade: '手作团购',
+  community: '社区团长',
+  photography: '摄影接单',
+  other: '其他',
+};
+
 const FilterPage: React.FC = () => {
+  const { projects, setGlobalFilter } = useApp();
+
   const [investmentRange, setInvestmentRange] = useState([0, 10000]);
   const [distanceRange, setDistanceRange] = useState(10);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -44,6 +57,49 @@ const FilterPage: React.FC = () => {
     { key: 'time_desc', label: '时间最多' },
   ];
 
+  const matchProjectCount = useMemo(() => {
+    let filtered = [...projects];
+
+    if (selectedCategories.length > 0) {
+      const labels = selectedCategories.map(k => categoryKeyToLabel[k]).filter(Boolean);
+      filtered = filtered.filter(p => {
+        const pLabel = categoryKeyToLabel[p.category] || p.category;
+        return labels.includes(pLabel) || selectedCategories.includes(p.category);
+      });
+    }
+
+    if (selectedTimeIntensities.length > 0) {
+      filtered = filtered.filter(p => selectedTimeIntensities.includes(p.timeIntensity));
+    }
+
+    if (selectedRoles.length > 0) {
+      filtered = filtered.filter(p =>
+        p.requiredRoles.some(role =>
+          selectedRoles.some(r =>
+            role.name.includes(r) ||
+            role.skills.some(s => s.includes(r))
+          )
+        )
+      );
+    }
+
+    const [minInv, maxInv] = investmentRange;
+    filtered = filtered.filter(p => {
+      const level = investmentLevels.find(l => l.key === p.investmentAmount);
+      if (!level) return true;
+      return level.min <= maxInv && level.max >= minInv;
+    });
+
+    if (distanceRange < 30) {
+      filtered = filtered.filter(p => {
+        const km = parseFloat(p.distance) || 0;
+        return km <= distanceRange;
+      });
+    }
+
+    return filtered.length;
+  }, [projects, selectedCategories, selectedTimeIntensities, selectedRoles, investmentRange, distanceRange]);
+
   const handleCategoryToggle = (key: string) => {
     setSelectedCategories(prev => 
       prev.includes(key) 
@@ -68,20 +124,6 @@ const FilterPage: React.FC = () => {
     );
   };
 
-  const resultCount = useMemo(() => {
-    let count = mockProjects.length;
-    if (selectedCategories.length > 0) {
-      count = Math.floor(count * 0.6);
-    }
-    if (selectedTimeIntensities.length > 0) {
-      count = Math.floor(count * 0.7);
-    }
-    if (selectedRoles.length > 0) {
-      count = Math.floor(count * 0.8);
-    }
-    return Math.max(1, count);
-  }, [selectedCategories, selectedTimeIntensities, selectedRoles]);
-
   const handleReset = () => {
     console.log('[FilterPage] 重置筛选');
     setInvestmentRange([0, 10000]);
@@ -90,6 +132,7 @@ const FilterPage: React.FC = () => {
     setSelectedTimeIntensities([]);
     setSelectedRoles([]);
     setSortBy('distance');
+    setGlobalFilter(null);
     Taro.showToast({
       title: '已重置',
       icon: 'success'
@@ -105,11 +148,27 @@ const FilterPage: React.FC = () => {
       selectedRoles,
       sortBy
     });
+
+    const filter: GlobalFilterOptions = {
+      categories: selectedCategories,
+      investmentMin: investmentRange[0],
+      investmentMax: investmentRange[1],
+      investmentLevels: (selectedTimeIntensities.length > 0
+        ? investmentLevels.filter(l => l.key !== 'all').map(l => l.key)
+        : []) as InvestmentLevel[],
+      timeIntensities: selectedTimeIntensities as TimeIntensity[],
+      roles: selectedRoles,
+      distanceMax: distanceRange,
+      sortBy,
+    };
+
+    setGlobalFilter(filter);
+
     Taro.showToast({
-      title: `找到 ${resultCount} 个项目`,
+      title: `找到 ${matchProjectCount} 个项目`,
       icon: 'success',
       success: () => {
-        setTimeout(() => Taro.navigateBack(), 800);
+        setTimeout(() => Taro.navigateBack(), 600);
       }
     });
   };
@@ -125,7 +184,7 @@ const FilterPage: React.FC = () => {
     <View className={styles.page}>
       <ScrollView scrollY className={styles.content}>
         <Text className={styles.resultCount}>
-          当前筛选条件下约有 <Text className={styles.highlight}>{resultCount}</Text> 个匹配项目
+          当前筛选条件下约有 <Text className={styles.highlight}>{matchProjectCount}</Text> 个匹配项目
         </Text>
 
         <View className={styles.section}>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Input, Textarea, Button, Image } from '@tarojs/components';
+import { View, Text, Input, Textarea, Button, Image, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
-import { RequiredRole } from '@/types/project';
+import { Project, RequiredRole } from '@/types/project';
+import { useApp } from '@/context/AppContext';
 import { categories, investmentLevels, timeIntensities } from '@/data/projects';
 import styles from './index.module.scss';
 
@@ -24,6 +25,8 @@ interface FormData {
 }
 
 const PublishPage: React.FC = () => {
+  const { user, addProject } = useApp();
+
   const [formData, setFormData] = useState<FormData>({
     title: '',
     category: '',
@@ -56,7 +59,6 @@ const PublishPage: React.FC = () => {
   };
 
   const addRole = () => {
-    console.log('[PublishPage] 添加角色');
     const newRoles = [
       ...formData.roles,
       { name: '', count: 1, skills: [], description: '' }
@@ -65,7 +67,6 @@ const PublishPage: React.FC = () => {
   };
 
   const removeRole = (index: number) => {
-    console.log('[PublishPage] 删除角色:', index);
     if (formData.roles.length <= 1) {
       Taro.showToast({
         title: '至少需要一个角色',
@@ -78,7 +79,6 @@ const PublishPage: React.FC = () => {
   };
 
   const handleUploadCover = () => {
-    console.log('[PublishPage] 上传封面');
     Taro.chooseImage({
       count: 1,
       success: (res) => {
@@ -103,13 +103,11 @@ const PublishPage: React.FC = () => {
       });
       return;
     }
-    console.log('[PublishPage] 添加标签:', tagInput);
     updateField('tags', [...formData.tags, tagInput.trim()]);
     setTagInput('');
   };
 
   const handleRemoveTag = (tag: string) => {
-    console.log('[PublishPage] 删除标签:', tag);
     updateField('tags', formData.tags.filter(t => t !== tag));
   };
 
@@ -142,13 +140,13 @@ const PublishPage: React.FC = () => {
       Taro.showToast({ title: '请填写合作目标', icon: 'none' });
       return false;
     }
-    
+
     const invalidRole = formData.roles.find(r => !r.name.trim());
     if (invalidRole) {
       Taro.showToast({ title: '请填写角色名称', icon: 'none' });
       return false;
     }
-    
+
     if (!formData.profitSharing.trim()) {
       Taro.showToast({ title: '请填写分账方式', icon: 'none' });
       return false;
@@ -165,36 +163,73 @@ const PublishPage: React.FC = () => {
       Taro.showToast({ title: '请填写退出约定', icon: 'none' });
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = () => {
     console.log('[PublishPage] 提交表单:', formData);
-    
+
     if (!validateForm()) return;
-    
+
     setSubmitting(true);
-    
+
     setTimeout(() => {
-      console.log('[PublishPage] 项目发布成功');
-      Taro.showToast({
-        title: '发布成功',
-        icon: 'success',
-        success: () => {
-          setTimeout(() => {
-            Taro.switchTab({
-              url: '/pages/discover/index'
-            });
-          }, 1500);
-        }
-      });
-      setSubmitting(false);
-    }, 1500);
+      try {
+        const newProject: Project = {
+          id: 'p_' + Date.now(),
+          title: formData.title.trim(),
+          category: formData.category as any,
+          description: formData.description.trim(),
+          coverImage: formData.coverImage || `https://picsum.photos/id/${100 + Math.floor(Math.random() * 900)}/750/500`,
+          location: formData.location.trim(),
+          distance: `${(Math.random() * 8 + 0.5).toFixed(1)}km`,
+          investmentAmount: formData.investmentAmount as any,
+          timeIntensity: formData.timeIntensity as any,
+          requiredRoles: formData.roles.filter(r => r.name.trim()),
+          profitSharing: formData.profitSharing.trim(),
+          startupCost: Number(formData.startupCost) || 0,
+          trialPeriod: formData.trialPeriod,
+          exitAgreement: formData.exitAgreement.trim(),
+          publisher: {
+            id: user.id,
+            name: user.name,
+            avatar: user.avatar,
+            creditScore: user.creditScore,
+            completedProjects: user.completedProjects,
+          },
+          status: 'recruiting',
+          createdAt: new Date().toISOString().slice(0, 10),
+          tags: formData.tags.length > 0 ? formData.tags : ['新发布', '同城'],
+          viewCount: 0,
+          applyCount: 0,
+        };
+
+        addProject(newProject);
+        console.log('[PublishPage] 项目已加入全局列表:', newProject.id, newProject.title);
+
+        Taro.showToast({
+          title: '发布成功',
+          icon: 'success',
+          duration: 1500,
+          success: () => {
+            setTimeout(() => {
+              setSubmitting(false);
+              Taro.switchTab({
+                url: '/pages/discover/index'
+              });
+            }, 1500);
+          }
+        });
+      } catch (err) {
+        console.error('[PublishPage] 发布失败:', err);
+        setSubmitting(false);
+        Taro.showToast({ title: '发布失败，请重试', icon: 'none' });
+      }
+    }, 1000);
   };
 
   const handlePreview = () => {
-    console.log('[PublishPage] 预览项目');
     Taro.showToast({
       title: '预览功能开发中',
       icon: 'none'
@@ -223,12 +258,12 @@ const PublishPage: React.FC = () => {
             )}
           </View>
         </View>
-        
+
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>
             基本信息 <Text className={styles.required}>*</Text>
           </Text>
-          
+
           <View className={styles.formItem}>
             <Text className={styles.label}>
               项目名称 <Text className={styles.required}>*</Text>
@@ -241,7 +276,7 @@ const PublishPage: React.FC = () => {
               maxlength={50}
             />
           </View>
-          
+
           <View className={styles.formItem}>
             <Text className={styles.label}>
               项目类别 <Text className={styles.required}>*</Text>
@@ -261,7 +296,7 @@ const PublishPage: React.FC = () => {
               ))}
             </View>
           </View>
-          
+
           <View className={styles.formItem}>
             <Text className={styles.label}>
               项目描述 <Text className={styles.required}>*</Text>
@@ -274,7 +309,7 @@ const PublishPage: React.FC = () => {
               maxlength={500}
             />
           </View>
-          
+
           <View className={styles.formItem}>
             <Text className={styles.label}>
               项目地点 <Text className={styles.required}>*</Text>
@@ -287,12 +322,12 @@ const PublishPage: React.FC = () => {
             />
           </View>
         </View>
-        
+
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>
             投入与时间 <Text className={styles.required}>*</Text>
           </Text>
-          
+
           <View className={styles.formItem}>
             <Text className={styles.label}>
               投入金额 <Text className={styles.required}>*</Text>
@@ -312,7 +347,7 @@ const PublishPage: React.FC = () => {
               ))}
             </View>
           </View>
-          
+
           <View className={styles.formItem}>
             <Text className={styles.label}>
               时间强度 <Text className={styles.required}>*</Text>
@@ -333,7 +368,7 @@ const PublishPage: React.FC = () => {
             </View>
           </View>
         </View>
-        
+
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>
             合作目标 <Text className={styles.required}>*</Text>
@@ -346,12 +381,12 @@ const PublishPage: React.FC = () => {
             maxlength={300}
           />
         </View>
-        
+
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>
             需要的人 <Text className={styles.required}>*</Text>
           </Text>
-          
+
           {formData.roles.map((role, index) => (
             <View key={index} className={styles.roleItem}>
               <View className={styles.roleHeader}>
@@ -363,7 +398,7 @@ const PublishPage: React.FC = () => {
                   ✕
                 </Button>
               </View>
-              
+
               <View className={styles.roleInputs}>
                 <View className={styles.roleInput}>
                   <Text className={styles.label}>角色名称</Text>
@@ -384,7 +419,7 @@ const PublishPage: React.FC = () => {
                   />
                 </View>
               </View>
-              
+
               <View className={styles.formItem}>
                 <Text className={styles.label}>所需技能（用逗号分隔）</Text>
                 <Input
@@ -394,7 +429,7 @@ const PublishPage: React.FC = () => {
                   onInput={(e) => updateRole(index, 'skills', e.detail.value.split(',').filter(Boolean))}
                 />
               </View>
-              
+
               <View className={styles.formItem}>
                 <Text className={styles.label}>职责描述</Text>
                 <Textarea
@@ -407,12 +442,12 @@ const PublishPage: React.FC = () => {
               </View>
             </View>
           ))}
-          
+
           <Button className={styles.addRoleBtn} onClick={addRole}>
             + 添加角色
           </Button>
         </View>
-        
+
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>
             分账方式 <Text className={styles.required}>*</Text>
@@ -425,7 +460,7 @@ const PublishPage: React.FC = () => {
             maxlength={300}
           />
         </View>
-        
+
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>
             启动成本 <Text className={styles.required}>*</Text>
@@ -439,7 +474,7 @@ const PublishPage: React.FC = () => {
           />
           <Text className={styles.tip}>启动成本将对所有合伙人透明公开</Text>
         </View>
-        
+
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>
             试运行周期 <Text className={styles.required}>*</Text>
@@ -459,7 +494,7 @@ const PublishPage: React.FC = () => {
             ))}
           </View>
         </View>
-        
+
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>
             退出约定 <Text className={styles.required}>*</Text>
@@ -472,7 +507,7 @@ const PublishPage: React.FC = () => {
             maxlength={300}
           />
         </View>
-        
+
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>
             项目标签
@@ -496,7 +531,7 @@ const PublishPage: React.FC = () => {
           <Text className={styles.tip}>添加标签可以让项目更容易被搜索到（最多5个）</Text>
         </View>
       </ScrollView>
-      
+
       <View className={styles.footer}>
         <Button className={styles.previewBtn} onClick={handlePreview}>
           预览

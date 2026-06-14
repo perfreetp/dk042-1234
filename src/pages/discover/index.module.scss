@@ -128,3 +128,31 @@
     color: $color-text-tertiary;
   }
 }
+
+.activeFilterBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 $page-padding $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background: linear-gradient(135deg, #fff7f0, #fff3e6);
+  border-radius: $radius-sm;
+  border: 2rpx solid rgba(255, 125, 0, 0.2);
+}
+
+.activeFilterLabel {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  flex: 1;
+  font-weight: $font-weight-medium;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activeFilterClear {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex-shrink: 0;
+  margin-left: $spacing-sm;
+}

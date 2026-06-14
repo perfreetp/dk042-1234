@@ -286,3 +286,30 @@
   font-weight: $font-weight-semibold;
   border: none;
 }
+
+.tip {
+  display: block;
+  margin-top: $spacing-sm;
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.scoreRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.scoreSlider {
+  flex: 1;
+  min-width: 0;
+}
+
+.scoreValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  flex-shrink: 0;
+  min-width: 80rpx;
+  text-align: right;
+}
