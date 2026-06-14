@@ -1,0 +1,130 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, #fff7f0 0%, rgba(255, 247, 240, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  padding-bottom: $spacing-md;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $page-padding;
+}
+
+.searchInput {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  height: 88rpx;
+  padding: 0 $spacing-lg;
+  background: $color-bg-card;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+  
+  &:active {
+    border-color: $color-primary;
+  }
+  
+  .icon {
+    font-size: $font-size-lg;
+    color: $color-text-tertiary;
+  }
+  
+  .placeholder {
+    font-size: $font-size-md;
+    color: $color-text-tertiary;
+  }
+}
+
+.filterBtn {
+  @include button-reset;
+  width: 88rpx;
+  height: 88rpx;
+  background: $color-bg-card;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-button;
+  font-size: $font-size-xl;
+  transition: all $transition-base;
+  
+  &:active {
+    transform: scale(0.95);
+    border-color: $color-primary;
+  }
+}
+
+.filterSection {
+  padding: 0 $page-padding;
+}
+
+.filterRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-sm;
+  
+  .label {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    flex-shrink: 0;
+    width: 100rpx;
+  }
+}
+
+.list {
+  padding: 0 $page-padding;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl 0;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.noMore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl 0;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx $page-padding;
+  
+  .icon {
+    font-size: 120rpx;
+    margin-bottom: $spacing-md;
+  }
+  
+  .text {
+    font-size: $font-size-md;
+    color: $color-text-tertiary;
+    margin-bottom: $spacing-sm;
+  }
+  
+  .subText {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}

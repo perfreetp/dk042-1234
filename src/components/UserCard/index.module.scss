@@ -1,0 +1,203 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+  
+  &:active {
+    transform: scale(0.99);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.avatar {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+  
+  image {
+    width: 100%;
+    height: 100%;
+    border-radius: $radius-round;
+  }
+}
+
+.matchScore {
+  position: absolute;
+  bottom: -8rpx;
+  right: -8rpx;
+  padding: 4rpx 12rpx;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-round;
+  border: 2rpx solid $color-bg-card;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xs;
+}
+
+.name {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.age {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.location {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+  @include text-ellipsis;
+}
+
+.creditRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.creditValue {
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.bio {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(2);
+}
+
+.skills {
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.skillTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+.skillTag {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 6rpx 16rpx;
+  background: $color-tag-bg;
+  color: $color-tag-text;
+  font-size: $font-size-xs;
+  border-radius: $radius-sm;
+  
+  .level {
+    padding: 2rpx 8rpx;
+    background: $color-primary;
+    color: $color-text-white;
+    font-size: 20rpx;
+    border-radius: 4rpx;
+  }
+}
+
+.complementary {
+  padding: $spacing-md;
+  background: linear-gradient(135deg, rgba(255, 125, 0, 0.08) 0%, rgba(255, 169, 77, 0.08) 100%);
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+}
+
+.complementaryTitle {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-xs;
+}
+
+.complementarySkills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  
+  .skill {
+    padding: 4rpx 12rpx;
+    background: $color-bg-card;
+    color: $color-primary;
+    font-size: $font-size-xs;
+    border-radius: $radius-sm;
+    border: 1rpx solid rgba(255, 125, 0, 0.2);
+  }
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-sm;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.primary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+}
+
+.secondary {
+  background: $color-bg-card;
+  border: 2rpx solid $color-border;
+  color: $color-text-secondary;
+}
+
+.outline {
+  background: $color-bg-card;
+  border: 2rpx solid $color-primary;
+  color: $color-primary;
+}

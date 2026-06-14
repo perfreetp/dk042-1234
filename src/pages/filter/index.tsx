@@ -1,0 +1,276 @@
+import React, { useState, useMemo } from 'react';
+import { View, Text, Slider, Button, ScrollView } from '@tarojs/components';
+import Taro from '@tarojs/taro';
+import { mockProjects } from '@/data/projects';
+import styles from './index.module.scss';
+
+const FilterPage: React.FC = () => {
+  const [investmentRange, setInvestmentRange] = useState([0, 10000]);
+  const [distanceRange, setDistanceRange] = useState(10);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedTimeIntensities, setSelectedTimeIntensities] = useState<string[]>([]);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState('distance');
+
+  const categories = [
+    { key: 'stall', label: '摊位经营' },
+    { key: 'review', label: '探店账号' },
+    { key: 'handmade', label: '手作团购' },
+    { key: 'community', label: '社区团长' },
+    { key: 'photography', label: '摄影接单' },
+    { key: 'other', label: '其他' },
+  ];
+
+  const timeIntensities = [
+    { key: 'weekend', label: '仅周末', desc: '每周投入10小时以内' },
+    { key: 'parttime', label: '兼职', desc: '每周投入10-20小时' },
+    { key: 'fulltime', label: '全职', desc: '每周投入20小时以上' },
+  ];
+
+  const roles = [
+    { key: 'operator', label: '运营负责人' },
+    { key: 'sales', label: '销售推广' },
+    { key: 'design', label: '设计创意' },
+    { key: 'tech', label: '技术开发' },
+    { key: 'finance', label: '财务行政' },
+    { key: 'investor', label: '资金投入' },
+  ];
+
+  const sortOptions = [
+    { key: 'distance', label: '距离最近' },
+    { key: 'investment_asc', label: '投入最低' },
+    { key: 'investment_desc', label: '投入最高' },
+    { key: 'time_asc', label: '时间最少' },
+    { key: 'time_desc', label: '时间最多' },
+  ];
+
+  const handleCategoryToggle = (key: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(key) 
+        ? prev.filter(c => c !== key)
+        : [...prev, key]
+    );
+  };
+
+  const handleTimeToggle = (key: string) => {
+    setSelectedTimeIntensities(prev => 
+      prev.includes(key) 
+        ? prev.filter(t => t !== key)
+        : [...prev, key]
+    );
+  };
+
+  const handleRoleToggle = (key: string) => {
+    setSelectedRoles(prev => 
+      prev.includes(key) 
+        ? prev.filter(r => r !== key)
+        : [...prev, key]
+    );
+  };
+
+  const resultCount = useMemo(() => {
+    let count = mockProjects.length;
+    if (selectedCategories.length > 0) {
+      count = Math.floor(count * 0.6);
+    }
+    if (selectedTimeIntensities.length > 0) {
+      count = Math.floor(count * 0.7);
+    }
+    if (selectedRoles.length > 0) {
+      count = Math.floor(count * 0.8);
+    }
+    return Math.max(1, count);
+  }, [selectedCategories, selectedTimeIntensities, selectedRoles]);
+
+  const handleReset = () => {
+    console.log('[FilterPage] 重置筛选');
+    setInvestmentRange([0, 10000]);
+    setDistanceRange(10);
+    setSelectedCategories([]);
+    setSelectedTimeIntensities([]);
+    setSelectedRoles([]);
+    setSortBy('distance');
+    Taro.showToast({
+      title: '已重置',
+      icon: 'success'
+    });
+  };
+
+  const handleApply = () => {
+    console.log('[FilterPage] 应用筛选:', {
+      investmentRange,
+      distanceRange,
+      selectedCategories,
+      selectedTimeIntensities,
+      selectedRoles,
+      sortBy
+    });
+    Taro.showToast({
+      title: `找到 ${resultCount} 个项目`,
+      icon: 'success',
+      success: () => {
+        setTimeout(() => Taro.navigateBack(), 800);
+      }
+    });
+  };
+
+  const handleLocationChange = () => {
+    Taro.showToast({
+      title: '定位功能开发中',
+      icon: 'none'
+    });
+  };
+
+  return (
+    <View className={styles.page}>
+      <ScrollView scrollY className={styles.content}>
+        <Text className={styles.resultCount}>
+          当前筛选条件下约有 <Text className={styles.highlight}>{resultCount}</Text> 个匹配项目
+        </Text>
+
+        <View className={styles.section}>
+          <Text className={styles.sectionTitle}>📍 当前位置</Text>
+          <View className={styles.locationRow}>
+            <Text className={styles.locationIcon}>📍</Text>
+            <Text className={styles.locationText}>北京市朝阳区三里屯</Text>
+            <Text className={styles.locationChange} onClick={handleLocationChange}>
+              切换
+            </Text>
+          </View>
+        </View>
+
+        <View className={styles.section}>
+          <Text className={styles.sectionTitle}>💰 投入金额</Text>
+          <View className={styles.rangeRow}>
+            <Text className={styles.rangeLabel}>最低</Text>
+            <Slider
+              className={styles.rangeSlider}
+              min={0}
+              max={5000}
+              step={100}
+              value={investmentRange[0]}
+              activeColor="#ff7d00"
+              backgroundColor="#f0f0f0"
+              blockColor="#ff7d00"
+              blockSize={24}
+              onChange={(e) => setInvestmentRange([e.detail.value, investmentRange[1]])}
+            />
+            <Text className={styles.rangeValue}>¥{investmentRange[0]}</Text>
+          </View>
+          <View className={styles.rangeRow}>
+            <Text className={styles.rangeLabel}>最高</Text>
+            <Slider
+              className={styles.rangeSlider}
+              min={1000}
+              max={20000}
+              step={500}
+              value={investmentRange[1]}
+              activeColor="#ff7d00"
+              backgroundColor="#f0f0f0"
+              blockColor="#ff7d00"
+              blockSize={24}
+              onChange={(e) => setInvestmentRange([investmentRange[0], e.detail.value])}
+            />
+            <Text className={styles.rangeValue}>¥{investmentRange[1]}</Text>
+          </View>
+        </View>
+
+        <View className={styles.section}>
+          <Text className={styles.sectionTitle}>📏 距离范围</Text>
+          <View className={styles.rangeRow}>
+            <Text className={styles.rangeLabel}>距离</Text>
+            <Slider
+              className={styles.rangeSlider}
+              min={1}
+              max={30}
+              step={1}
+              value={distanceRange}
+              activeColor="#ff7d00"
+              backgroundColor="#f0f0f0"
+              blockColor="#ff7d00"
+              blockSize={24}
+              onChange={(e) => setDistanceRange(e.detail.value)}
+            />
+            <Text className={styles.rangeValue}>{distanceRange}km</Text>
+          </View>
+        </View>
+
+        <View className={styles.section}>
+          <Text className={styles.sectionTitle}>🏷️ 项目类别</Text>
+          <View className={styles.tagsRow}>
+            {categories.map(cat => (
+              <View
+                key={cat.key}
+                className={`${styles.tagItem} ${selectedCategories.includes(cat.key) ? styles.tagItemActive : ''}`}
+                onClick={() => handleCategoryToggle(cat.key)}
+              >
+                {cat.label}
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <View className={styles.section}>
+          <Text className={styles.sectionTitle}>⏰ 时间强度</Text>
+          {timeIntensities.map(item => (
+            <View 
+              key={item.key}
+              className={styles.checkboxItem}
+              onClick={() => handleTimeToggle(item.key)}
+            >
+              <View className={`${styles.checkbox} ${selectedTimeIntensities.includes(item.key) ? styles.checkboxChecked : ''}`}>
+                {selectedTimeIntensities.includes(item.key) && <Text className={styles.checkIcon}>✓</Text>}
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text className={styles.checkboxLabel}>{item.label}</Text>
+                <Text className={styles.checkboxDesc}>{item.desc}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        <View className={styles.section}>
+          <Text className={styles.sectionTitle}>👤 期望角色</Text>
+          <View className={styles.tagsRow}>
+            {roles.map(role => (
+              <View
+                key={role.key}
+                className={`${styles.tagItem} ${selectedRoles.includes(role.key) ? styles.tagItemActive : ''}`}
+                onClick={() => handleRoleToggle(role.key)}
+              >
+                {role.label}
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <View className={styles.section}>
+          <Text className={styles.sectionTitle}>📊 排序方式</Text>
+          {sortOptions.map(option => (
+            <View 
+              key={option.key}
+              className={styles.sortItem}
+              onClick={() => setSortBy(option.key)}
+            >
+              <Text className={styles.sortLabel}>{option.label}</Text>
+              <View className={`${styles.sortRadio} ${sortBy === option.key ? styles.sortRadioChecked : ''}`}>
+                {sortBy === option.key && <View className={styles.sortRadioInner} />}
+              </View>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+
+      <View className={styles.footer}>
+        <Button className={`${styles.btn} ${styles.btnOutline}`} onClick={handleReset}>
+          重置
+        </Button>
+        <Button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleApply}>
+          应用筛选
+        </Button>
+      </View>
+    </View>
+  );
+};
+
+export default FilterPage;

@@ -1,0 +1,161 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+  
+  &:active {
+    transform: scale(0.99);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+.cover {
+  position: relative;
+  width: 100%;
+  height: 320rpx;
+  
+  image {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.categoryTag {
+  position: absolute;
+  top: $spacing-md;
+  left: $spacing-md;
+  padding: 6rpx 16rpx;
+  background: rgba(255, 125, 0, 0.9);
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  border-radius: $radius-sm;
+}
+
+.distanceTag {
+  position: absolute;
+  top: $spacing-md;
+  right: $spacing-md;
+  padding: 6rpx 16rpx;
+  background: rgba(0, 0, 0, 0.6);
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  border-radius: $radius-sm;
+}
+
+.content {
+  padding: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis;
+}
+
+.desc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+  @include text-ellipsis-multi(2);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  
+  .label {
+    margin-right: 8rpx;
+  }
+  
+  .value {
+    color: $color-text-secondary;
+    font-weight: $font-weight-medium;
+  }
+  
+  .price {
+    color: $color-price;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-md;
+  }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.tag {
+  padding: 4rpx 16rpx;
+  background: $color-tag-bg;
+  color: $color-tag-text;
+  font-size: $font-size-xs;
+  border-radius: $radius-sm;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.publisher {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.avatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  
+  image {
+    width: 100%;
+    height: 100%;
+    border-radius: $radius-round;
+  }
+}
+
+.publisherInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.credit {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.stats {
+  display: flex;
+  gap: $spacing-md;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

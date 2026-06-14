@@ -1,0 +1,288 @@
+@import "@/styles/variables.scss";
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.content {
+  padding: $spacing-lg;
+}
+
+.avatarSection {
+  background: $color-white;
+  border-radius: $radius-md;
+  padding: $spacing-xl $spacing-lg;
+  margin-bottom: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  border: 4rpx solid $color-primary-light;
+}
+
+.uploadBtn {
+  color: $color-primary;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+}
+
+.section {
+  background: $color-white;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.formItem {
+  margin-bottom: $spacing-lg;
+}
+
+.formItem:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  font-size: $font-size-base;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  font-size: $font-size-base;
+  color: $color-text-primary;
+  border: none;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 160rpx;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  font-size: $font-size-base;
+  color: $color-text-primary;
+  border: none;
+  line-height: 1.6;
+}
+
+.skillRow {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.skillTag {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  background: $color-primary-light;
+  border-radius: $radius-md;
+}
+
+.skillName {
+  font-size: $font-size-base;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.removeIcon {
+  font-size: 24rpx;
+  color: $color-primary;
+}
+
+.addSkillBtn {
+  padding: $spacing-sm $spacing-md;
+  border: 2rpx dashed $color-primary;
+  border-radius: $radius-md;
+  color: $color-primary;
+  font-size: $font-size-base;
+}
+
+.timeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+}
+
+.timeColumn {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.timeTitle {
+  font-size: $font-size-base;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.timeSlot {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+}
+
+.timeCheckbox {
+  width: 32rpx;
+  height: 32rpx;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timeCheckboxChecked {
+  background: $color-primary;
+  border-color: $color-primary;
+}
+
+.checkIcon {
+  color: $color-white;
+  font-size: 20rpx;
+}
+
+.timeText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.resourceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+}
+
+.resourceItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+}
+
+.resourceCheckbox {
+  width: 32rpx;
+  height: 32rpx;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.resourceCheckboxChecked {
+  background: $color-primary;
+  border-color: $color-primary;
+}
+
+.resourceIcon {
+  font-size: 32rpx;
+}
+
+.resourceName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  flex: 1;
+}
+
+.tagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.tagItem {
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  border: 2rpx solid transparent;
+}
+
+.tagItemActive {
+  background: $color-primary-light;
+  color: $color-primary;
+  border-color: $color-primary;
+}
+
+.selectItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.selectItem:last-child {
+  margin-bottom: 0;
+}
+
+.selectLabel {
+  font-size: $font-size-base;
+  color: $color-text-primary;
+}
+
+.selectValue {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-white;
+  padding: $spacing-md $spacing-lg;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.saveBtn {
+  width: 100%;
+  height: 88rpx;
+  background: $color-primary;
+  color: $color-white;
+  border-radius: $radius-lg;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  border: none;
+}
